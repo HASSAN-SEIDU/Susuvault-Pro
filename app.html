@@ -1,38 +1,22 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SusuVault Pro</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
-body{background:#000;color:#fff;min-height:100vh;padding:10px}
-.header{background:#111;border:2px solid #FFD700;border-radius:16px;padding:14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.logo{font-weight:900;font-size:20px}.y{color:#FFD700}.w{color:#fff}
-.badge{background:#FFD700;color:#000;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:900}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.stat{background:#fff;color:#000;border-radius:12px;padding:12px;text-align:center}
-.stat small{color:#888;font-size:10px;display:block}.stat b{font-size:18px}
-.main{background:#fff;color:#000;border-radius:16px;padding:15px}
-.tabs{display:flex;gap:5px;margin-bottom:12px;overflow-x:auto;padding-bottom:5px}
-.tab{padding:8px 12px;border-radius:20px;border:2px solid #000;background:#fff;color:#000;font-weight:700;font-size:12px;white-space:nowrap;cursor:pointer}
-.tab.active{background:#000;color:#FFD700}
-input{width:100%;padding:12px;border:2px solid #ddd;border-radius:10px;margin:5px 0;font-size:14px}
-.btn{width:100%;padding:12px;border:none;border-radius:10px;font-weight:900;cursor:pointer;margin-top:8px}
-.btn-black{background:#000;color:#FFD700}.btn-gold{background:#FFD700;color:#000}
-.cust{background:#f5f5f5;border-left:4px solid #FFD700;padding:10px;border-radius:8px;margin:6px 0;display:flex;justify-content:space-between;align-items:center}
-.pbtn{background:#25D366;color:#fff;border:none;padding:7px 12px;border-radius:6px;font-weight:700;cursor:pointer}
-.dbtn{background:#ff4444;color:#fff;border:none;padding:7px 10px;border-radius:6px;cursor:pointer;margin-left:5px}
-.hidden{display:none}
-.footer{text-align:center;color:#666;font-size:10px;margin-top:12px}
-</style>
-</head>
-<body>
-<div class="header">
-<div class="logo"><span class="y">SUSU</span><span class="w">VAULT PRO</span></div>
-<div class="badge">PRO ACTIVE ✓</div>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>SusuVault Pro</title><style>body{background:#000;color:#fff;font-family:Arial;padding:10px} .h{background:#111;border:2px solid gold;border-radius:12px;padding:12px;display:flex;justify-content:space-between} .s{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0} .b{background:#fff;color:#000;border-radius:10px;padding:10px;text-align:center} .m{background:#fff;color:#000;border-radius:12px;padding:12px} .tab{padding:8px 12px;border:2px solid #000;border-radius:20px;margin:3px;font-weight:700} .active{background:#000;color:gold} .cust{background:#f5f5f5;border-left:4px solid gold;padding:8px;margin:5px 0;border-radius:6px;display:flex;justify-content:space-between} button{cursor:pointer} input{width:100%;padding:10px;margin:5px 0;border-radius:8px;border:2px solid #ddd}</style></head><body>
+<div class="h"><b style="color:gold">SUSU</b><b>VAULT PRO</b><span style="background:gold;color:#000;padding:3px 8px;border-radius:10px;font-size:10px">PRO ACTIVE</span></div>
+<div class="s"><div class="b"><small>Customers</small><br><b id="c1">0</b></div><div class="b"><small>Today</small><br><b id="c2">GH₵0</b></div><div class="b"><small>Total</small><br><b id="c3">GH₵0</b></div><div class="b"><small>All</small><br><b id="c4">GH₵0</b></div></div>
+<div class="m">
+<button class="tab active" onclick="show('a')" id="ba">💰Collect</button><button class="tab" onclick="show('b')" id="bb">👥Customers</button><button class="tab" onclick="show('c')" id="bc">➕Add</button><button class="tab" onclick="show('d')" id="bd">📊Report</button>
+<div id="a" style="margin-top:10px"><input id="q" placeholder="Search..." oninput="draw(1)"><div id="l1"></div></div>
+<div id="b" style="display:none;margin-top:10px"><div id="l2"></div></div>
+<div id="c" style="display:none;margin-top:10px"><input id="n1" placeholder="Name"><input id="n2" placeholder="Phone"><input id="n3" type="number" placeholder="Daily Amount"><input id="n4" placeholder="Card No"><button onclick="add()" style="background:#000;color:gold;width:100%;padding:12px;border-radius:10px;font-weight:900;margin-top:8px">SAVE</button></div>
+<div id="d" style="display:none;margin-top:10px"><p>Today: <b id="r1">GH₵0</b></p><p>Total: <b id="r2">GH₵0</b></p><button onclick="share()" style="width:100%;background:#000;color:gold;padding:10px;border-radius:8px;margin-top:10px">Share Report</button><br><a href="index.html" style="color:blue">Go Home</a></div>
 </div>
-<div class="stats">
-<div class="stat"><small>TOTAL CUSTOMERS</small><b id="totalCust">0</b></div>
-<div class="stat"><small>TODAY COLLECTED</small><b id="todayColl">GH₵0</b></div>
-<div class="stat"><small>TOTAL SAVINGS</small><b id="totalSav
+<script>
+let C=JSON.parse(localStorage.getItem('susu_customers')||'[]'),T=JSON.parse(localStorage.getItem('susu_collections')||'[]');
+function save(){localStorage.setItem('susu_customers',JSON.stringify(C));localStorage.setItem('susu_collections',JSON.stringify(T));upd()}
+function show(x){['a','b','c','d'].forEach(y=>document.getElementById(y).style.display='none');document.getElementById(x).style.display='block';['ba','bb','bc','bd'].forEach(y=>document.getElementById(y).classList.remove('active'));document.getElementById('b'+x).classList.add('active');draw(x=='a')}
+function add(){let n=n1.value.trim(),p=n2.value.trim(),a=parseFloat(n3.value),cd=n4.value.trim();if(!n||!a){alert('Name & Amount');return} C.push({id:Date.now(),name:n,phone:p,amount:a,card:cd||'C'+(C.length+1),total:0});save();n1.value=n2.value=n3.value=n4.value='';alert('Added');show('a')}
+function draw(col){let q=(document.getElementById('q').value||'').toLowerCase(),L=C.filter(v=>v.name.toLowerCase().includes(q)),h='';if(!L.length)h='<p style="text-align:center;color:#888;padding:15px">No customers</p>';L.forEach(v=>{if(col)h+=`<div class="cust"><div><b>${v.name}</b><br><small>${v.card} GH₵${v.amount} Total GH₵${v.total}</small></div><button onclick="colc(${v.id})" style="background:#25D366;color:#fff;border:none;padding:6px 10px;border-radius:6px">Collect</button></div>`;else h+=`<div class="cust"><div><b>${v.name}</b><br><small>${v.phone} ${v.card} GH₵${v.total}</small></div><button onclick="del(${v.id})" style="background:red;color:#fff;border:none;padding:5px 8px;border-radius:5px">X</button></div>`});l1.innerHTML=h;if(col){let h2='';C.forEach(v=>{h2+=`<div class="cust"><div><b>${v.name}</b><br><small>${v.phone} ${v.card} GH₵${v.total}</small></div><button onclick="del(${v.id})" style="background:red;color:#fff;border:none;padding:5px 8px;border-radius:5px">X</button></div>`});l2.innerHTML=h2||'<p>No customers</p>'}else l2.innerHTML=h;if(!col)l1.innerHTML=C.map(v=>`<div class="cust"><div><b>${v.name}</b><br><small>${v.card} GH₵${v.amount} Total GH₵${v.total}</small></div><button onclick="colc(${v.id})" style="background:#25D366;color:#fff;border:none;padding:6px 10px;border-radius:6px">Collect</button></div>`).join('')||'<p>No customers</p>'}
+function colc(id){let c=C.find(v=>v.id==id);c.total+=c.amount;T.push({id,amount:c.amount,date:new Date().toISOString()});save();draw(true);alert('Collected GH₵'+c.amount)}
+function del(id){if(!confirm('Delete?'))return;C=C.filter(v=>v.id!=id);save();draw(false)}
+function upd(){let today=new Date().toDateString(),ts=T.filter(v=>new Date(v.date).toDateString()==today).reduce((a,b)=>a+b.amount,0),tt=T.reduce((a,b)=>a+b.amount,0);c1.innerText=C.length;c2.innerText='GH₵'+ts;c3.innerText='GH₵'+tt;c4.innerText='GH₵'+tt;r1.innerText='GH₵'+ts;r2.innerText='GH₵'+tt}
+function share(){let txt=`SusuVault Report ${new Date().toLocaleString()}%0A`;C.forEach(v=>txt+=`${v.name}: GH₵${v.total}%0A`);window.open('https://wa.me/?text='+txt,'_blank')}
+upd();draw(true);
+</script></body></html>
