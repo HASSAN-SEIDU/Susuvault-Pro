@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SusuVault Pro - Dashboard</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif}
+body{background:#000;color:#fff;min-height:100vh;padding:12px}
+.header{background:linear-gradient(135deg,#000 0%,#1a1a1a 100%);border:2px solid #FFD700;border-radius:16px;padding:16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.logo{font-weight:900;font-size:22px}.logo span:first-child{color:#FFC300}.logo span:last-child{color:#fff}
+.pro-badge{background:#FFD700;color:#000;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:900}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat-card{background:#fff;color:#000;border-radius:12px;padding:14px;text-align:center}
+.stat-card b{display:block;font-size:20px;margin-top:4px}.stat-card small{color:#666;font-size:11px}
+.main-card{background:#fff;color:#000;border-radius:16px;padding:18px;margin-bottom:12px}
+.tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto}
+.tab{padding:8px 14px;border-radius:20px;border:2px solid #000;background:#fff;color:#000;font-weight:700;font-size:13px;white-space:nowrap;cursor:pointer}
+.tab.active{background:#000;color:#FFD700}
+input,select{width:100%;padding:12px;border:2px solid #ddd;border-radius:10px;margin:6px 0;font-size:14px}
+.btn{background:#000;color:#FFD700;border:none;padding:12px;width:100%;border-radius:10px;font-weight:900;cursor:pointer;margin-top:8px}
+.btn-gold{background:#FFD700;color:#000}
+.customer-item{background:#f8f8f8;border-left:4px solid #FFD700;padding:10px;border-radius:8px;margin:6px 0;display:flex;justify-content:space-between;align-items:center}
+.actions{display:flex;gap:6px}
+.icon-btn{border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700}
+.pay{background:#25D366;color:#fff}.del{background:#ff4444;color:#fff}
+.footer{text-align:center;color:#888;font-size:11px;margin-top:15px;padding:10px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<script>
+if(localStorage.getItem('susu_pro_activated')!=='true'){
+  location.href='index.html';
+}
+</script>
+<div class="header">
+<div class="logo"><span>SUSU</span><span>VAULT PRO</span></div>
+<div class="pro-badge">PRO ACTIVE ✓</div>
+</div>
+<div class="stats">
+<div class="stat-card"><small>TOTAL CUSTOMERS</small><b id="totalCust">0</b></div>
+<div class="stat-card"><small>TODAY COLLECTED</small><b id="todayColl">GH₵0</b></div>
+<div class="stat-card"><small>TOTAL SAVINGS</small><b id="totalSav">GH₵0</b></div>
+<div class="stat-card"><small>MONTHLY</small><b id="monthColl">GH₵0</b></div>
+</div>
+<div class="main-card">
+<div class="tabs">
+<button class="tab active" onclick="showTab('collect')">💰 Collect</button>
+<button class="tab" onclick="showTab('customers')">👥 Customers</button>
+<button class="tab" onclick="showTab('add')">➕ Add New</button>
+<button class="tab" onclick="showTab('report')">📊 Report</button>
+</div>
+<div id="tab-collect">
+<h3 style="margin-bottom:8px">Daily Collection</h3>
+<input id="searchCust" placeholder="Search customer name..." oninput="renderCustomers(true)">
+<div id="collectList"></div>
+</div>
+<div id="tab-customers" class="hidden">
+<h3>All Customers</h3>
+<div id="customerList"></div>
+</div>
+<div id="tab-add" class="hidden">
+<h3>Add New Customer</h3>
+<input id="newName" placeholder="Full Name">
+<input id="newPhone" placeholder="Phone e.g. 024...">
+<input id="newAmount" type="number" placeholder="Daily Amount e.g. 20">
+<input id="newCard" placeholder="Card Number e.g. 001">
+<button class="btn btn-gold" onclick="addCustomer()">SAVE CUSTOMER</button>
+</div>
+<div id="tab-report" class="hidden">
+<h3>Reports</h3>
+<div style="background:#FFF9C4;padding:12px;border-radius:10px;margin-top:10px">
+<b>Today:</b> <span id="rToday">GH₵0</span><br>
+<b>This Week:</b> <span id="rWeek">GH₵0</span><br>
+<b>This Month:</b> <span id="rMonth">GH₵0</span><br>
+<b>All Time:</b> <span id="rAll">GH₵0</span>
+</div>
+<button class="btn" onclick="exportData()" style="margin-top:12px">📥 Export Data (WhatsApp)</button>
+<button class="btn" style="background:#ff4444;color:#fff;margin-top:8px" onclick="resetAll()">⚠️ Reset All Data</button>
+</div>
+</div>
+<div class="footer">
+SusuVault Pro © 2026 Hassan Seidu | MoMo: 0248643827<br>
+Licensed: <span id="licCode"></span>
+</div>
+<script>
+let customers = JSON.parse(localStorage.getItem('susu_customers')||'[]');
+let collections = JSON.parse(localStorage.getItem('susu_collections')||'[]');
+document.getElementById('licCode').innerText = localStorage.getItem('susu_active_code')||'SUSU250';
+function save(){localStorage.setItem('susu_customers',JSON.stringify(customers));localStorage.setItem('susu_collections',JSON.stringify(collections));updateStats();}
+function showTab(t){
+document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+event.target.classList.add('active');
+document.getElementById('tab-collect').classList.add('hidden');
+document.getElementById('tab-customers').classList.add('hidden');
+document.getElementById('tab-add').classList.add('hidden');
+document.getElementById('tab-report').classList.add('hidden');
+document.getElementById('tab-'+t).classList.remove('hidden');
+if(t==='customers'||t==='collect')renderCustomers(t==='collect');
+}
+function addCustomer(){
+const name=document.getElementById('newName').value.trim();
+const phone=document.getElementById('newPhone').value.trim();
+const amount=parseFloat(document.getElementById('newAmount').value);
+const card=document.getElementById('newCard').value.trim();
+if(!name||!amount){alert('Enter name and amount');return;}
+customers.push({id:Date.now(),name,phone,amount,card:card||'C-'+(customers.length+1),total:0,joined:new Date().toLocaleDateString()});
+save();alert('Customer Added!');document.getElementById('newName').value='';document.getElementById('newPhone').value='';document.getElementById('newAmount').value='';document.getElementById('newCard').value='';
+renderCustomers(false);
+}
+function renderCustomers(collectMode){
+let q=document.getElementById('searchCust')?.value.toLowerCase()||'';
