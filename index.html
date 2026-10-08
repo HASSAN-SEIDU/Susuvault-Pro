@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SusuVault PRO</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+<div id="app"></div>
+<script>
+const STORAGE='susuvault_pro_v3'; const AUTH='susuvault_auth';
+const defaultData={customers:[],collections:[],codes:[{code:'SUSU250',used:false},{code:'SUSU-0248',used:false}]};
+function load(){try{return JSON.parse(localStorage.getItem(STORAGE))||defaultData}catch{return defaultData}}
+function save(d){localStorage.setItem(STORAGE,JSON.stringify(d))}
+let data=load(); let view='customers'; let sel=null; let q='';
+function fDate(d){return new Date(d).toLocaleDateString('en-GH',{day:'2-digit',month:'short',year:'numeric'})}
+function fDateTime(d){return new Date(d).toLocaleString('en-GH')}
+function render(){
+ const paid=localStorage.getItem(AUTH)==='paid';
+ const app=document.getElementById('app');
+ if(!paid){
+  app.innerHTML=`<div class="min-h-screen flex items-center justify-center bg-black p-4"><div class="bg-white rounded-2xl p-6 w-full max-w-md"><h1 class="text-3xl font-bold text-center"><span class="text-yellow-500">SUSU</span>VAULT PRO</h1><p class="text-center text-xs">GHANA PROFESSIONAL SYSTEM</p><div class="mt-4 bg-black text-yellow-400 p-3 rounded-xl text-center"><p class="font-bold">MOMO: 0248643827</p><p class="text-xs">SEINI IMORO SEIDU - GH₵250</p></div><input id="codeIn" placeholder="Enter Code e.g. SUSU250" class="w-full border-2 p-3 rounded-xl mt-4 font-bold uppercase"><button onclick="activate()" class="w-full bg-black text-yellow-400 py-3 rounded-xl font-bold mt-3">ACTIVATE PRO NOW</button><p class="text-center text-xs mt-3">Demo: SUSU250</p></div></div>`;return;
+ }
+ const todayTotal=data.collections.filter(c=>new Date(c.date).toDateString()==new Date().toDateString()).reduce((s,c)=>s+c.amount,0);
+ const allTotal=data.collections.reduce((s,c)=>s+c.amount,0);
+ app.innerHTML=`<div class="bg-black text-white p-3 flex justify-between sticky top-0 z-50"><div><h1 class="font-bold text-yellow-400">SUSU PRO - ${allTotal} GH₵ Total</h1><p class="text-xs">Admin: 0248643827</p></div><button onclick="localStorage.removeItem(AUTH);render()" class="text-xs bg-gray-800 px-3 py-1 rounded">Logout</button></div>
+ <div class="flex bg-white border-b sticky top-[52px] z-40"><button onclick="view='customers';render()" class="flex-1 py-3 text-sm font-bold ${view=='customers'?'border-b-2 border-black':''}">Customers</button><button onclick="view='reports';render()" class="flex-1 py-3 text-sm font-bold ${view=='reports'?'border-b-2 border-black':''}">Reports</button><button onclick="view='admin';render()" class="flex-1 py-3 text-sm font-bold ${view=='admin'?'border-b-2 border-black':''}">Admin</button></div>
+ <div class="p-3 max-w-3xl mx-auto">
+ ${view=='customers'?`<div class="bg-white p-4 rounded-xl shadow mb-3"><h2 class="font-bold mb-3">+ Register New Customer (Full Details)</h2>
+ <div class="grid grid-cols-2 gap-2">
+ <input id="cName" placeholder="Full Name *" class="border p-2 rounded text-sm col-span-2">
+ <input id="cPhone" placeholder="Phone *" class="border p-2 rounded text-sm"><input id="cCard" placeholder="Susu Card No" class="border p-2 rounded text-sm">
+ <input id="cIdType" placeholder="ID Type (Ghana Card)" class="border p-2 rounded text-sm"><input id="cIdNo" placeholder="ID Number" class="border p-2 rounded text-sm">
+ <input id="cDaily" type="number" placeholder="Daily Amount" class="border p-2 rounded text-sm"><input id="cOcc" placeholder="Occupation" class="border p-2 rounded text-sm">
+ <input id="cAddr" placeholder="House Address / Location" class="border p-2 rounded text-sm col-span-2">
+ <input id="cKin" placeholder="Next of Kin & Phone" class="border p-2 rounded text-sm col-span-2">
+ <div class="col-span-2"><label class="text-xs font-bold">Passport Picture (Camera)</label><input id="cPhoto" type="file" accept="image/*" class="border p-2 rounded w-full"></div>
+ </div><button onclick="addCust()" class="w-full bg-black text-yellow-400 mt-3 py-3 rounded-xl font-bold">ADD CUSTOMER</button></div>
+ <input oninput="q=this.value;render()" value="${q}" placeholder="Search name, phone, card..." class="w-full border p-3 rounded-xl mb-3">
+ <div class="space-y-2">${data.customers.filter(c=>(c.name+c.phone+c.cardNo).toLowerCase().includes(q.toLowerCase())).map(c=>{const t=data.collections.filter(x=>x.customerId==c.id).reduce((s,x)=>s+x.amount,0);return `<div onclick="openC('${c.id}')" class="bg-white p-3 rounded-xl shadow flex gap-3"><img src="${c.photo||'https://via.placeholder.com/60'}" class="w-14 h-14 rounded-full object-cover"><div class="flex-1"><p class="font-bold text-sm">${c.name.toUpperCase()} ${c.cardNo?`(${c.cardNo})`:''}</p><p class="text-xs">${c.phone} | GH₵${c.dailyAmount||0}/day | ${fDate(c.registeredAt)}</p><p class="text-xs text-gray-500">${c.address||''} | ID:${c.idNo||''}</p></div><div class="text-right"><p class="font-bold text-green-600">GH₵${t}</p><p class="text-[10px] bg-black text-white px-2 py-1 rounded">VIEW</p></div></div>`}).join('')}</div>`:''}
+ ${view=='reports'?`<div class="grid grid-cols-3 gap-2 mb-3"><div class="bg-white p-3 rounded-xl text-center"><p class="text-xs">Today</p><p class="font-bold text-green-600">GH₵${todayTotal}</p></div><div class="bg-white p-3 rounded-xl text-center"><p class="text-xs">Month</p><p class="font-bold">GH₵${data.collections.filter(c=>new Date(c.date).getMonth()==new Date().getMonth()).reduce((s,c)=>s+c.amount,0)}</p></div><div class="bg-white p-3 rounded-xl text-center"><p class="text-xs">All Time</p><p class="font-bold">GH₵${allTotal}</p></div></div><div class="bg-white p-4 rounded-xl"><h3 class="font-bold mb-2">Collection Report with Dates</h3><table class="w-full text-xs"><tr class="bg-black text-white"><th class="p-2 text-left">Date</th><th>Customer</th><th>Amount</th></tr>${data.collections.slice().reverse().map(col=>{const cust=data.customers.find(c=>c.id==col.customerId);return `<tr class="border-b"><td class="p-2">${fDateTime(col.date)}</td><td class="p-2">${cust?cust.name:''}</td><td class="p-2 font-bold">GH₵${col.amount}</td></tr>`}).join('')}</table><button onclick="expCSV()" class="w-full mt-3 bg-green-600 text-white py-2 rounded font-bold">Export CSV</button></div>`:''}
+ ${view=='admin'?`<div class="bg-white p-4 rounded-xl"><h3 class="font-bold">Activation Codes - ONE TIME USE ONLY</h3><p class="text-xs text-gray-600">Solves sharing problem! Each code burns after use.</p><button onclick="genCode()" class="w-full bg-yellow-400 text-black py-3 rounded-xl font-bold mt-3">GENERATE NEW UNIQUE CODE</button><div class="mt-4 space-y-2">${data.codes.map(c=>`<div class="flex justify-between border p-2 rounded text-sm"><span class="font-bold ${c.used?'text-gray-400 line-through':'text-green-600'}">${c.code}</span><span class="text-xs">${c.used?'USED':'ACTIVE'}</span></div>`).join('')}</div></div>`:''}
+ </div>
+ <div id="modal" class="fixed inset-0 bg-black/70 hidden z-50 p-4 overflow-auto"><div class="bg-white rounded-2xl max-w-lg mx-auto"><div id="modalC"></div></div></div>`;
+}
+window.activate=()=>{const co=document.getElementById('codeIn').value.trim().toUpperCase();const f=data.codes.find(c=>c.code==co&&!c.used);if(f){f.used=true;save(data);localStorage.setItem(AUTH,'paid');render();}else{alert('Invalid or used code! Use SUSU250');}};
+window.addCust=async()=>{const n=document.getElementById('cName').value.trim();const p=document.getElementById('cPhone').value.trim();if(!n||!p){alert('Name & Phone required');return;}let photo='';const file=document.getElementById('cPhoto').files[0];if(file){photo=await new Promise(r=>{const fr=new FileReader();fr.onload=e=>r(e.target.result);fr.readAsDataURL(file);});}data.customers.push({id:Date.now().toString(),name:n,phone:p,cardNo:document.getElementById('cCard').value,idType:document.getElementById('cIdType').value,idNo:document.getElementById('cIdNo').value,dailyAmount:document.getElementById('cDaily').value,occupation:document.getElementById('cOcc').value,address:document.getElementById('cAddr').value,nextOfKin:document.getElementById('cKin').value,photo:photo,registeredAt:new Date().toISOString()});save(data);render();alert('Customer added with photo!');};
+window.openC=(id)=>{sel=data.customers.find(c=>c.id==id);const cols=data.collections.filter(c=>c.customerId==id);const total=cols.reduce((s,c)=>s+c.amount,0);document.getElementById('modalC').innerHTML=`<div class="p-4"><div class="flex justify-between"><h2 class="font-bold">${sel.name.toUpperCase()} Profile</h2><button onclick="document.getElementById('modal').classList.add('hidden')" class="bg-black text-white w-8 h-8 rounded-full">X</button></div><div class="flex gap-4 mt-3"><img src="${sel.photo||'https://via.placeholder.com/100'}" class="w-24 h-24 rounded-xl object-cover border-2"><div class="text-sm"><p><b>Phone:</b> ${sel.phone}</p><p><b>Card:</b> ${sel.cardNo}</p><p><b>ID:</b> ${sel.idType} ${sel.idNo}</p><p><b>Occupation:</b> ${sel.occupation}</p><p class="text-xs">Reg: ${fDate(sel.registeredAt)}</p><p class="text-xs">Addr: ${sel.address}</p><p class="text-xs">Kin: ${sel.nextOfKin}</p></div></div><div class="grid grid-cols-2 gap-2 mt-4"><div class="bg-green-50 p-3 rounded-xl text-center"><p class="text-xs">Total Saved</p><p class="font-bold text-green-600 text-xl">GH₵${total}</p></div><div class="bg-yellow-50 p-3 rounded-xl text-center"><p class="text-xs">Daily</p><p class="font-bold text-xl">GH₵${sel.dailyAmount||0}</p></div></div><div class="mt-4 flex gap-2"><input id="amt" type="number" placeholder="Amount" class="flex-1 border p-3 rounded-xl"><button onclick="collect()" class="bg-green-600 text-white px-6 rounded-xl font-bold">COLLECT</button></div><div class="mt-4 max-h-60 overflow-auto"><table class="w-full text-xs"><tr class="bg-gray-100"><th class="p-2 text-left">Date & Time</th><th>Amount</th></tr>${cols.slice().reverse().map(c=>`<tr class="border-b"><td class="p-2">${fDateTime(c.date)}</td><td class="p-2 font-bold">GH₵${c.amount}</td></tr>`).join('')||'<tr><td colspan=2 class="p-4 text-center">No collections</td></tr>'}</table></div></div>`;document.getElementById('modal').classList.remove('hidden');};
+window.collect=()=>{const a=parseFloat(document.getElementById('amt').value);if(!a){alert('Enter amount');return;}data.collections.push({id:Date.now().toString(),customerId:sel.id,amount:a,date:new Date().toISOString()});save(data);openC(sel.id);render();};
+window.genCode=()=>{const nc='SUSU-'+Math.random().toString(36).substring(2,6).toUpperCase();data.codes.push({code:nc,used:false});save(data);render();};
+window.expCSV=()=>{let csv="Date,Customer,Phone,Card,Amount\n";data.collections.forEach(col=>{const cust=data.customers.find(c=>c.id==col.customerId);csv+=`${col.date},${cust?cust.name:''},${cust?cust.phone:''},${cust?cust.cardNo:''},${col.amount}\n`;});const b=new Blob([csv],{type:'text/csv'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download='SusuReport.csv';a.click();};
+render();
+</script>
+</body>
+</html>
