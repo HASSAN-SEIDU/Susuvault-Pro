@@ -1,85 +1,67 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SusuVault Pro - Activation</title>
 <style>
-body{background:#000;color:#fff;font-family:Arial;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;padding:15px}
-.card{background:#fff;color:#000;border-radius:20px;padding:25px;max-width:380px;width:100%;text-align:center;box-shadow:0 10px 30px rgba(255,215,0,0.3)}
-.logo{font-size:28px;font-weight:900;margin-bottom:5px}.logo span:first-child{color:#FFC300}.logo span:last-child{color:#000}
-.sub{font-size:12px;letter-spacing:1px;margin-bottom:20px;color:#555}
-.momo{background:#000;color:#FFD700;padding:15px;border-radius:12px;margin-bottom:15px}
-.momo b{font-size:18px;display:block}.momo small{color:#FFD700}
-input{width:100%;padding:14px;border:2px solid #ddd;border-radius:10px;margin:10px 0;box-sizing:border-box;font-size:16px}
-.btn{background:#000;color:#FFD700;border:none;padding:14px;width:100%;border-radius:10px;font-weight:900;font-size:16px;cursor:pointer;margin-top:10px}
-.btn2{background:#25D366;color:#fff;border:none;padding:14px;width:100%;border-radius:10px;font-weight:900;font-size:14px;cursor:pointer;margin-top:10px;display:none}
-.info{background:#FFF9C4;padding:12px;border-radius:10px;font-size:13px;margin-top:15px;text-align:left;display:none}
-.codebox{font-size:22px;font-weight:900;letter-spacing:2px;background:#000;color:#FFD700;padding:10px;border-radius:8px;margin:10px 0;word-break:break-all}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#000;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:15px}
+.card{background:#fff;color:#000;width:100%;max-width:400px;border-radius:20px;padding:25px;border:3px solid #FFD700;text-align:center}
+.logo{font-weight:900;font-size:28px;margin-bottom:5px}.logo .y{color:#FFC300}.logo .w{color:#000}
+.badge{background:#000;color:#FFD700;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:900;display:inline-block;margin-bottom:15px}
+input{width:100%;padding:14px;border:2px solid #000;border-radius:12px;margin:8px 0;font-size:16px}
+.btn{width:100%;padding:14px;border:none;border-radius:12px;font-weight:900;font-size:15px;cursor:pointer;margin-top:10px}
+.btn-gold{background:#FFD700;color:#000}
+.btn-black{background:#000;color:#FFD700}
+.price{background:#FFF9C4;border:2px dashed #FFD700;padding:12px;border-radius:12px;margin:12px 0}
 </style>
 </head>
 <body>
 <div class="card">
-<div class="logo"><span>SUSU</span><span>VAULT PRO</span></div>
-<div class="sub">GHANA PROFESSIONAL SYSTEM</div>
-<div class="momo"><b>MOMO: 0248643827</b><small>SEINI IMORO SEIDU - GH₵250</small></div>
-<div id="step1">
+<div class="logo"><span class="y">SUSU</span><span class="w">VAULT PRO</span></div>
+<div class="badge">GH₵250 LIFETIME LICENSE</div>
+<p style="font-size:13px;color:#555">Professional Susu Collection System</p>
+
+<div class="price">
+<b>Pay GH₵250 to Activate</b><br>
+<small>MoMo: <b>0248643827</b><br>Name: Hassan Seidu</small>
+</div>
+
 <input id="custName" placeholder="Your Full Name">
-<input id="custPhone" type="tel" placeholder="Your MoMo Number e.g. 024...">
-<button class="btn" onclick="requestCode()">REQUEST ACTIVATION CODE</button>
-<p style="font-size:12px;color:#666;margin-top:10px">After payment, click above. Code will be sent to Admin.</p>
+<input id="custPhone" placeholder="Your WhatsApp Number e.g. 024...">
+<button class="btn btn-gold" onclick="requestCode()">REQUEST ACTIVATION CODE</button>
+
+<div style="margin:15px 0;border-top:2px solid #eee;padding-top:15px">
+<input id="actCode" placeholder="Enter Activation Code e.g. SUSU250">
+<button class="btn btn-black" onclick="activate()">ACTIVATE PRO NOW ✓</button>
 </div>
-<div id="step2" class="info">
-<b>✅ Request Sent to Admin!</b><br><br>
-Name: <span id="rName"></span><br>Phone: <span id="rPhone"></span><br><br>
-Your Request ID: <div class="codebox" id="rId"></div>
-<div style="background:#000;color:#FFD700;padding:8px;border-radius:6px;font-size:12px">This code was sent to Hassan (Admin). Wait for him to confirm your GH₵250 payment.</div>
-<button class="btn2" id="waBtn" onclick="sendWhatsApp()">📲 OPEN WHATSAPP TO NOTIFY ADMIN</button>
-<button class="btn" style="background:#ddd;color:#000;margin-top:20px" onclick="location.reload()">New Request</button>
+
+<p style="font-size:11px;color:#888;margin-top:10px">After payment, you will get code via WhatsApp.<br>Contact: 0248643827</p>
 </div>
-<hr style="margin:20px 0">
-<input id="actCode" placeholder="ENTER CODE E.G. SUSU-A7K9P2">
-<button class="btn" onclick="activate()">ACTIVATE PRO NOW</button>
-<p style="font-size:12px;color:#888;margin-top:8px">Demo: SUSU250 (for testing)</p>
-</div>
+
 <script>
-let currentRequest=null;
-function genCode(){const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let c="SUSU-";for(let i=0;i<6;i++)c+=chars[Math.floor(Math.random()*chars.length)];return c;}
-function genReqId(){return "REQ-"+Date.now().toString().slice(-6)+"-"+Math.floor(Math.random()*900+100);}
 function requestCode(){
-const name=document.getElementById('custName').value.trim();
-const phone=document.getElementById('custPhone').value.trim();
-if(!name||!phone){alert("Please enter your name and MoMo number");return;}
-const reqId=genReqId();const actCode=genCode();
-currentRequest={reqId,actCode,name,phone,time:new Date().toLocaleString()};
-let requests=JSON.parse(localStorage.getItem('susu_requests')||'[]');
-requests.unshift(currentRequest);
-localStorage.setItem('susu_requests',JSON.stringify(requests));
-document.getElementById('rName').innerText=name;
-document.getElementById('rPhone').innerText=phone;
-document.getElementById('rId').innerText=reqId;
-document.getElementById('step1').style.display='none';
-document.getElementById('step2').style.display='block';
-document.getElementById('waBtn').style.display='block';
-const msg=`🔥 *NEW SUSUVAULT PRO REQUEST*%0A%0AName: ${encodeURIComponent(name)}%0APhone: ${phone}%0ARequest ID: ${reqId}%0A%0A*ACTIVATION CODE (Send to customer after payment):*%0A${actCode}%0A%0ATime: ${encodeURIComponent(currentRequest.time)}%0A%0A_This code was auto-generated by system_`;
-window._waMsg=msg;
-}
-function sendWhatsApp(){
-const adminNumber="233248643827";
-const url=`https://wa.me/${adminNumber}?text=${window._waMsg}`;
-window.open(url,'_blank');
+let n=document.getElementById('custName').value;
+let p=document.getElementById('custPhone').value;
+if(!n||!p){alert('Enter name and phone');return;}
+let msg=`Hello Hassan! I want to buy SusuVault Pro GH₵250%0AName: ${n}%0APhone: ${p}%0AMoMo: 0248643827`;
+window.open(`https://wa.me/233248643827?text=${msg}`,'_blank');
 }
 function activate(){
-const code=document.getElementById('actCode').value.trim().toUpperCase();
-if(!code){alert("Enter code");return;}
-if(code==="SUSU250"){localStorage.setItem('susu_pro_activated','true');alert("✅ Activated! Welcome");location.href="app.html";return;}
-let requests=JSON.parse(localStorage.getItem('susu_requests')||'[]');
-let found=requests.find(r=>r.actCode===code);
-if(found){localStorage.setItem('susu_pro_activated','true');localStorage.setItem('susu_active_code',code);alert("✅ PRO Activated! "+code);location.href="app.html";}
-else{if(code.startsWith("SUSU-")&&code.length>=9){localStorage.setItem('susu_pro_activated','true');alert("✅ PRO Activated!");location.href="app.html";}else{alert("❌ Invalid Code. Contact Admin 0248643827");}}
+let code=document.getElementById('actCode').value.trim().toUpperCase();
+let valid=['SUSU250','HASSAN2026','SUSU-GH250','PRO250','SUSUPRO'];
+if(valid.includes(code)||code.startsWith('SUSU')){
+localStorage.setItem('susu_pro_activated','true');
+localStorage.setItem('susu_active_code',code);
+alert('✅ Activated! Welcome to Pro!');
+location.href='app.html';
+}else{alert('❌ Invalid Code! Pay GH₵250 to 0248643827 and get code');}
 }
-let adminBuffer="";
-document.addEventListener('keydown',(e)=>{adminBuffer+=e.key.toUpperCase();if(adminBuffer.length>20)adminBuffer=adminBuffer.slice(-20);if(adminBuffer.includes("ADMIN")){adminBuffer="";let reqs=JSON.parse(localStorage.getItem('susu_requests')||'[]');if(reqs.length===0){alert("No requests yet");return;}let list=reqs.map(r=>`ID:${r.reqId} Name:${r.name} ${r.phone} CODE:${r.actCode} Time:${r.time} ---`).join("\n");alert("ADMIN PANEL - ALL CODES:\n\n"+list);}});
+// If already activated, go to app
+if(localStorage.getItem('susu_pro_activated')==='true'){
+// don't auto redirect, let user click
+document.getElementById('actCode').value=localStorage.getItem('susu_active_code')||'';
+}
 </script>
 </body>
 </html>
